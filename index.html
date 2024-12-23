@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>MayuLodge 360 Video Player</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <style>
+        body {
+            background: url('https://speed.myhostingdomain.net:2083/cpsess4508819739/frontend/jupiter/filemanager/showfile.html?file=fondo.jpg&fileop=&dir=%2Fhome%2Fdesarro2%2Fpublic_html&dirop=&charset=&file_charset=&baseurl=&basedir=') no-repeat center center fixed; /* Imagen de fondo */
+            background-size: cover; /* Cubrir toda el área */
+            color: #2c5f2d; /* Texto de color verde oscuro */
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        
+        .menu {
+            background-color: rgba(0, 128, 0, 0.8); /* Verde con transparencia */
+            overflow: hidden;
+            padding: 10px 0;
+        }
+
+        .menu a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+        }
+
+        .menu a:hover {
+            background-color: #45a049;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 50px;
+            color: white; /* Color blanco para mejor contraste con el fondo */
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: rgba(240, 248, 240, 0.8); /* Fondo con transparencia para contraste */
+            border-radius: 10px; /* Borde redondeado */
+            padding: 20px;
+            max-width: 90%;
+            margin: auto;
+            margin-top: 20px;
+        }
+
+        .description {
+            text-align: center;
+            margin: 20px 0;
+            color: white; /* Color blanco para mejor contraste con el fondo */
+        }
+
+        #video-container {
+            border: 5px solid #2c5f2d; /* Borde de color verde oscuro */
+            border-radius: 10px; /* Borde redondeado */
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .button {
+            background-color: #4caf50; /* Botones de color verde */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .control-button {
+            background-color: #4caf50;
+            border: none;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .control-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="menu">
+        <a href="#home">Inicio</a>
+        <a href="#about">Acerca de</a>
+        <a href="#contact">Contacto</a>
+    </div>
+
+    <h1>Eco-Friendly 360 Video Player</h1>
+    <div class="description">
+        <p>Disfruta de una experiencia de video inmersiva y ecológica.</p>
+    </div>
+    <div class="container">
+        <div id="video-container">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+            <script>
+                // create a scene
+                const scene = new THREE.Scene();
+
+                // create a perspective camera
+                const width = 640;
+                const height = 480;
+                const camera = new THREE.PerspectiveCamera(75, width / height, 1, 100);
+
+                // create a renderer
+                const renderer = new THREE.WebGLRenderer();
+                renderer.setSize(width, height);
+
+                // display the renderer
+                document.getElementById("video-container").appendChild(renderer.domElement);
+
+                // create a sphere geometry
+                const geometry = new THREE.SphereGeometry(15, 32, 16);
+                
+                // create a VideoTexture
+                const videoElement = document.createElement('video');
+                videoElement.src = "https://s.bepro11.com/vr-video-sample.mp4";
+                videoElement.loop = true;
+                videoElement.muted = true;
+                videoElement.playsInline = true;
+                videoElement.crossOrigin = "anonymous";
+                videoElement.play();
+                const texture = new THREE.VideoTexture(videoElement);
+
+                // create a material from the texture
+                const material = new THREE.MeshBasicMaterial({ map: texture });
+                material.side = THREE.BackSide;
+
+                // create a mesh and add to the scene
+                const mesh = new THREE.Mesh(geometry, material);
+                scene.add(mesh);
+
+                renderer.setAnimationLoop(() => renderer.render(scene, camera));
+
+                // zoom in / out
+                const clamp = (v, min, max) => Math.max(min, Math.min(v, max));
+                renderer.domElement.addEventListener('wheel', e => {
+                    camera.fov = clamp(camera.fov + e.deltaY / 10, 10, 120);
+                    camera.updateProjectionMatrix();
+                });
+
+                // rotate camera
+                let mouseDown = false;
+                renderer.domElement.addEventListener('mousedown', e => {
+                    if (e.button === 0) mouseDown = true;
+                });
+
+                window.addEventListener('mouseup', e => {
+                    if (e.button === 0) mouseDown = false;
+                });
+
+                window.addEventListener('mousemove', e => {
+                    if (!mouseDown) return;
+
+                    const { movementX, movementY } = e;
+
+                    const rotateX = movementY / 100;
+                    const rotateY = movementX / 100;
+
+                    camera.rotateX(rotateX);
+                    camera.rotateY(rotateY);
+                });
+
+                function rotateCamera(x, y) {
+                    camera.rotateX(x);
+                    camera.rotateY(y);
+                }
+            </script>
+        </div>
+        <div class="buttons">
+            <button class="button" onclick="playVideo()">Play</button>
+            <button class="button" onclick="pauseVideo()">Pause</button>
+        </div>
+        <div class="control-buttons">
+            <button class="control-button" onclick="rotateCamera(-0.1, 0)">Up</button>
+            <button class="control-button" onclick="rotateCamera(0.1, 0)">Down</button>
+            <button class="control-button" onclick="rotateCamera(0, -0.1)">Left</button>
+            <button class="control-button" onclick="rotateCamera(0, 0.1)">Right</button>
+        </div>
+    </div>
+    <script>
+        function playVideo() {
+            videoElement.play();
+        }
+
+        function pauseVideo() {
+            videoElement.pause();
+        }
+    </script>
+</body>
+
+</html>
